@@ -9,7 +9,7 @@ port = 3000
 @app.route('/Bok')
 @app.route('/')
 def get_books():
-    with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
+    with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         cursor.execute('SELECT * FROM Bok')
         rows = cursor.fetchall()
