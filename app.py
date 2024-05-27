@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import sqlite3
 
@@ -47,6 +47,41 @@ def delete_book(booknumber):
             return jsonify({'error': 'Boken finnes ikke i databasen'}), 404
     return jsonify({'message': 'Boken ble slettet fra databasen.'})
 
+@app.route('/leggtilbok', methods=['POST'])
+def add_book():
+    if not request.json:
+        return jsonify({'error': 'Request must be JSON'}), 400
+    
+    required_fields = ['title', 'author', 'isbn', 'booknumber', 'image_path']
+    for field in required_fields:
+        if field not in request.json:
+            return jsonify({'error': f'Mangler verdien til: {field}'}), 400
+    
+    title = request.json['title']
+    author = request.json['author']
+    isbn = request.json['isbn']
+    booknumber = request.json['booknumber']
+    image_path = request.json['image_path']
+    
+    with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
+        cursor = db.cursor()
+        
+        cursor.execute('''
+        SELECT * FROM Bok
+        WHERE title = ? AND author = ? AND isbn = ? AND booknumber = ? AND image_path = ?
+        ''', (title, author, isbn, booknumber, image_path))
+        
+        if cursor.fetchone() is not None:
+            return jsonify({'error': 'Boken finnes fra før'}), 409
+  
+        cursor.execute('''
+        INSERT INTO Bok (title, author, isbn, booknumber, image_path)
+        VALUES (?, ?, ?, ?, ?)
+        ''', (title, author, isbn, booknumber, image_path))
+        
+        db.commit()
+    
+    return jsonify({'message': f'{title} ble registrert'}), 201
 
 if __name__ == '__main__':
     app.run(debug=True, port=port)
