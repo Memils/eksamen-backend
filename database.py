@@ -5,7 +5,7 @@ conn = sqlite3.connect('library-books.db')
 cursor = conn.cursor()
 
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS Books (
+CREATE TABLE IF NOT EXISTS Bok (
     id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     author TEXT NOT NULL,
@@ -26,7 +26,7 @@ with open('bøker.csv', 'r', encoding='utf-8') as file:
         books.append((title, author, isbn, booknumber, image_path))
 
 
-cursor.executemany('INSERT INTO Books(title, author, isbn, booknumber, image_path) VALUES (?, ?, ?, ?, ?)', books)
+cursor.executemany('INSERT INTO Bok(title, author, isbn, booknumber, image_path) VALUES (?, ?, ?, ?, ?)', books)
 
 conn.commit()
 conn.close()
