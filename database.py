@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS Books (
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     isbn INTEGER,
-    booknumber INTEGER,
-    FOREIGN KEY (id) REFERENCES Books(booknumber)
+    booknumber INTEGER
 )''')
 
 books = [
