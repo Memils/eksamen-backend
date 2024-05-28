@@ -18,17 +18,26 @@ def get_books():
         rows = cursor.fetchall()
     return jsonify(rows)
 
-@app.route('/Bok/<int:booknumber>')
-def get_booknumber(booknumber):
-    print(booknumber)
-    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
-    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
-    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
+@app.route('/Bok/<int:booknumber>', methods=['GET'])
+def get_book_by_number(booknumber):
     with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         cursor.execute('SELECT * FROM Bok WHERE booknumber = ?', (booknumber,))
-        rows = cursor.fetchall()
-    return jsonify(rows)
+        book = cursor.fetchone()
+    if book:
+        return jsonify({
+            'success': True,
+            'book': {
+                'title': book[1],
+                'author': book[2],
+                'isbn': book[3],
+                'booknumber': book[4],
+                'image_path': book[5]
+            }
+        })
+    else:
+        return jsonify({'success': False, 'message': 'Bok ikke funnet'}), 404
+
 
 @app.route('/filter/<string:search_string>')
 def filter_books(search_string):
@@ -100,6 +109,7 @@ def add_book():
         return jsonify({'success': True, 'message': f'{title} ble registrert'}), 201
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=port)
