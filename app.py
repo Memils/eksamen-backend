@@ -9,7 +9,10 @@ port = 3000
 @app.route('/Bok')
 @app.route('/')
 def get_books():
-    with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
+    with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         cursor.execute('SELECT * FROM Bok')
         rows = cursor.fetchall()
@@ -18,6 +21,9 @@ def get_books():
 @app.route('/Bok/<int:booknumber>')
 def get_booknumber(booknumber):
     print(booknumber)
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
     with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         cursor.execute('SELECT * FROM Bok WHERE booknumber = ?', (booknumber,))
@@ -26,6 +32,9 @@ def get_booknumber(booknumber):
 
 @app.route('/filter/<string:search_string>')
 def filter_books(search_string):
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
     with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         query = '''
@@ -39,6 +48,9 @@ def filter_books(search_string):
 
 @app.route('/slett/<int:booknumber>', methods=['DELETE'])
 def delete_book(booknumber):
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
     with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         cursor.execute('DELETE FROM Bok WHERE booknumber = ?', (booknumber,))
@@ -63,6 +75,9 @@ def add_book():
     booknumber = request.json['booknumber']
     image_path = request.json['image_path']
     
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
     with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         
