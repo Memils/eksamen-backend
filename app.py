@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import sqlite3
 
@@ -64,7 +64,7 @@ def add_book():
     if not request.json:
         return jsonify({'error': 'Request must be JSON'}), 400
     
-    required_fields = ['title', 'author', 'isbn', 'booknumber', 'image_path']
+    required_fields = ['title', 'author', 'isbn', 'booknumber']
     for field in required_fields:
         if field not in request.json:
             return jsonify({'error': f'Mangler verdien til: {field}'}), 400
@@ -73,8 +73,7 @@ def add_book():
     author = request.json['author']
     isbn = request.json['isbn']
     booknumber = request.json['booknumber']
-    image_path = request.json['image_path']
-    
+    image_path = f'static/barcode/{booknumber}.png'
     # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
     #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
     # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
@@ -87,7 +86,7 @@ def add_book():
         ''', (title, author, isbn, booknumber, image_path))
         
         if cursor.fetchone() is not None:
-            return jsonify({'error': 'Boken finnes fra før'}), 409
+            return jsonify({'error': 'Boka finnes fra før'}), 409
   
         cursor.execute('''
         INSERT INTO Bok (title, author, isbn, booknumber, image_path)
