@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS Låntakere
     fornavn TEXT NOT NULL,
     etternavn TEXT NOT NULL,
     number TEXT NOT NULL,
-    
+    image_path TEXT,
+    photo TEXT
 ''')
 with open('bøker.csv', 'r', encoding='utf-8') as file:
     reader = csv.DictReader(file)
@@ -33,8 +34,22 @@ with open('bøker.csv', 'r', encoding='utf-8') as file:
         image_path = f'static/barcode/{booknumber}.png'  
         books.append((title, author, isbn, booknumber, image_path))
 
-
 cursor.executemany('INSERT INTO Bok(title, author, isbn, booknumber, image_path) VALUES (?, ?, ?, ?, ?)', books)
+
+with open('låntakere.csv', 'r', encoding='utf-8') as file:
+    reader = csv.DictReader(file)
+    students = []
+    for row in reader:
+        fornavn = row['Fornavn']
+        etternavn = row['Etternavn']
+        number = int(row['Strekkode'])
+        image_path = f'static/barcode/{number}.png'  
+        photo = f'static/bilder/{number}.png'
+        books.append((fornavn, etternavn, number, image_path, photo))
+
+cursor.executemany('INSERT INTO Låntakere(fornavn, etternavn, number, image_path, photo) VALUES (?, ?, ?, ?, ?)', students)
+
+
 
 conn.commit()
 conn.close()
