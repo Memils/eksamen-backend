@@ -14,6 +14,14 @@ CREATE TABLE IF NOT EXISTS Bok (
     image_path TEXT
 )''')
 
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS Låntakere
+    id INTEGER PRIMARY KEY,
+    fornavn TEXT NOT NULL,
+    etternavn TEXT NOT NULL,
+    number TEXT NOT NULL,
+    
+''')
 with open('bøker.csv', 'r', encoding='utf-8') as file:
     reader = csv.DictReader(file)
     books = []
