@@ -48,7 +48,9 @@ def get_book_by_number(booknumber):
                 'author': book[2],
                 'isbn': book[3],
                 'booknumber': book[4],
-                'image_path': book[5]
+                'image_path': book[5],
+                'loaned-to': book[6],
+                'loan-date': book[7]
             }
         })
     else:
