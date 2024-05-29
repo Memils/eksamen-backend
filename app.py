@@ -161,7 +161,7 @@ def add_user():
     etternavn = request.json['etternavn']
     number = request.json['number']
     image_path = f'static/barcode/{number}.png'
-    photo = f'static/bilder/{number}.png'
+    photo = f'static/bilder/{number}.jpg'
     
     try:
         # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
