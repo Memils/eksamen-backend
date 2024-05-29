@@ -110,6 +110,16 @@ def add_book():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@app.route('/Låntakere')
+def get_users():
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
+    with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM Låntakere')
+        rows = cursor.fetchall()
+    return jsonify(rows)
 
 if __name__ == '__main__':
     app.run(debug=True, port=port)

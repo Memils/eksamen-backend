@@ -38,16 +38,16 @@ cursor.executemany('INSERT INTO Bok(title, author, isbn, booknumber, image_path)
 
 with open('låntakere.csv', 'r', encoding='utf-8') as file:
     reader = csv.DictReader(file)
-    students = []
+    users = []
     for row in reader:
         fornavn = row['Fornavn']
         etternavn = row['Etternavn']
         number = int(row['Strekkode'])
         image_path = f'static/barcode/{number}.png'  
         photo = f'static/bilder/{number}.png'
-        books.append((fornavn, etternavn, number, image_path, photo))
+        users.append((fornavn, etternavn, number, image_path, photo))
 
-cursor.executemany('INSERT INTO Låntakere(fornavn, etternavn, number, image_path, photo) VALUES (?, ?, ?, ?, ?)', students)
+cursor.executemany('INSERT INTO Låntakere(fornavn, etternavn, number, image_path, photo) VALUES (?, ?, ?, ?, ?)', users)
 
 
 
