@@ -20,6 +20,9 @@ def get_books():
 
 @app.route('/Bok/<int:booknumber>', methods=['GET'])
 def get_book_by_number(booknumber):
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
     with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
         cursor = db.cursor()
         cursor.execute('SELECT * FROM Bok WHERE booknumber = ?', (booknumber,))
@@ -120,6 +123,29 @@ def get_users():
         cursor.execute('SELECT * FROM Låntakere')
         rows = cursor.fetchall()
     return jsonify(rows)
+
+@app.route('/Låntakere/<int:number>', methods=['GET'])
+def get_user_by_number(number):
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt
+    with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM Låntakere WHERE number = ?', (number,))
+        user = cursor.fetchone()
+    if user:
+        return jsonify({
+            'success': True,
+            'bruker': {
+                'fornavn': user[1],
+                'etternavn': user[2],
+                'strekkode': user[3],
+                'image_path': user[4],
+                'photo': user[5]
+            }
+        })
+    else:
+        return jsonify({'success': False, 'message': 'Bruker ble ikke funnet'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, port=port)
