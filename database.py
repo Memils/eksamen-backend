@@ -44,7 +44,7 @@ with open('låntakere.csv', 'r', encoding='utf-8') as file:
         etternavn = row['Etternavn']
         number = int(row['Strekkode'])
         image_path = f'static/barcode/{number}.png'  
-        photo = f'static/bilder/{number}.png'
+        photo = f'static/bilder/{number}.jpg'
         users.append((fornavn, etternavn, number, image_path, photo))
 
 cursor.executemany('INSERT INTO Låntakere(fornavn, etternavn, number, image_path, photo) VALUES (?, ?, ?, ?, ?)', users)
