@@ -139,13 +139,55 @@ def get_user_by_number(number):
             'bruker': {
                 'fornavn': user[1],
                 'etternavn': user[2],
-                'strekkode': user[3],
+                'number': user[3],
                 'image_path': user[4],
                 'photo': user[5]
             }
         })
     else:
         return jsonify({'success': False, 'message': 'Bruker ble ikke funnet'}), 404
+    
+@app.route('/leggtilbruker', methods=['POST'])
+def add_user():
+    if not request.json:
+        return jsonify({'success': False, 'message': 'Request must be JSON'}), 400
+    
+    required_fields = ['fornavn', 'etternavn', 'number']
+    for field in required_fields:
+        if field not in request.json:
+            return jsonify({'success': False, 'message': f'Mangler verdien til: {field}'}), 400
+    
+    fornavn = request.json['fornavn']
+    etternavn = request.json['etternavn']
+    number = request.json['number']
+    image_path = f'static/barcode/{number}.png'
+    photo = f'static/bilder/{number}.png'
+    
+    try:
+        # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+        #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+        # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt    
+        with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
+            cursor = db.cursor()
+            
+            cursor.execute('''
+            SELECT * FROM Låntakere
+            WHERE fornavn = ? AND etternavn = ? AND number = ?
+            ''', (fornavn, etternavn, number))
+            
+            if cursor.fetchone() is not None:
+                return jsonify({'success': False, 'message': 'Boka finnes fra før'}), 409
+      
+            cursor.execute('''
+            INSERT INTO Låntakere (fornavn, etternavn, number, image_path, photo)
+            VALUES (?, ?, ?, ?, ?)
+            ''', (fornavn, etternavn, number, image_path, photo))
+            
+            db.commit()
+        
+        return jsonify({'success': True, 'message': f'{fornavn, etternavn} ble registrert'}), 201
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=port)
