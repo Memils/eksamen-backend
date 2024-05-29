@@ -6,6 +6,19 @@ app = Flask(__name__)
 CORS(app)
 port = 3000
 
+# ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+#with sqlite3.connect('/var/www/html/Backend/library-books.db') as conn:
+# ↓ Bruk denne om du ønsker at APIen skal fungere lokal
+#with sqlite3.connect('./library-books.db') as conn:
+#  cursor = conn.cursor()
+#   cursor.execute('''
+#        ALTER TABLE Bok ADD COLUMN loaned_to INTEGER
+#    ''')
+#    cursor.execute('''
+#        ALTER TABLE Bok ADD COLUMN loan_date TEXT
+#    ''')
+#    conn.commit()
+
 @app.route('/Bok')
 @app.route('/')
 def get_books():
@@ -188,6 +201,27 @@ def add_user():
         return jsonify({'success': True, 'message': f'{fornavn, etternavn} ble registrert'}), 201
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+@app.route('/Bok/lån/<int:booknumber>', methods=['POST'])
+def loan_book(booknumber):
+    if not request.json or 'usernumber' not in request.json:
+        return jsonify({'error': 'Request must be JSON and contain usernumber'}), 400
+
+    usernumber = request.json['usernumber']
+    loan_date = request.json.get('loan_date', '')
+ # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt  
+    with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
+        cursor = db.cursor()
+        cursor.execute('''
+            UPDATE Bok
+            SET loaned_to = ?, loan_date = ?
+            WHERE booknumber = ?
+        ''', (usernumber, loan_date, booknumber))
+        db.commit()
+    
+    return jsonify({'success': True, 'message': 'Boka er lånt ut'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=port)
