@@ -209,7 +209,7 @@ def loan_book(booknumber):
 
     usernumber = request.json['usernumber']
     loan_date = request.json.get('loan_date', '')
- # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
     #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
     # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt  
     with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
@@ -222,6 +222,22 @@ def loan_book(booknumber):
         db.commit()
     
     return jsonify({'success': True, 'message': 'Boka er lånt ut'}), 200
+
+@app.route('/Bok/innlever/<int:booknumber>', methods=['POST'])
+def return_book(booknumber):
+    # ↓ Bruk denne om du ønsker at APIen skal fungere med ubuntu serveren
+    #with sqlite3.connect('/var/www/html/Backend/library-books.db', check_same_thread=False) as db:
+    # ↓ Bruk denne om du ønsker at APIen skal fungere lokalt  
+    with sqlite3.connect('./library-books.db', check_same_thread=False) as db:
+        cursor = db.cursor()
+        cursor.execute('''
+            UPDATE Bok
+            SET loaned_to = NULL, loan_date = NULL
+            WHERE booknumber = ?
+        ''', (booknumber,))
+        db.commit()
+    
+    return jsonify({'success': True, 'message': 'Boka er innlevert'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=port)
